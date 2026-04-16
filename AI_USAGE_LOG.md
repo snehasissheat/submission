@@ -1,117 +1,139 @@
 # AI Usage Log
 
-**Candidate Name**: [Your Name]  
+**Candidate Name**: Snehasis SHit  
 **Date**: April 16, 2026  
 **Assignment**: Token Bucket Rate Limiter  
-**Tool Used**: GitHub Copilot / Claude
 
 ---
 
 ## Summary
 
-AI tools were consulted at **one point** during the implementation phase to assist with project structure and code organization. The core algorithmic logic, bug fixes, and test validation were completed independently. All AI suggestions were reviewed against the APPROACH.md and selectively adopted based on fit with the designed solution.
+AI assistance was used during the coding and verification phase after `APPROACH.md` was written. The assistance was used for implementation review, code fixes, test expansion, environment setup, and final verification. All changes were reviewed before being kept.
 
 ---
 
-## AI Interaction #1: Project Structure and Initial Implementation
+## AI Interaction #1: Requirement Check Against Assignment
 
-**When**: After APPROACH.md completion, before implementation
+**When**: During implementation phase
 
-**Tool**: GitHub Copilot
+**Tool**: ChatGPT / Codex
 
 **What I Asked**:
-```
-"Help me structure Python project files for a token bucket rate limiter. 
-I need: main implementation, type definitions, utilities, tests, and demo. 
-Show folder organization and basic module structure."
+```text
+Check whether the code aligns with the assignment requirements.
 ```
 
-**What AI Suggested**:
-- Creating separate modules: `main.py`, `types.py`, `utils.py`
-- Test files: `test_edge_cases.py`, `test_scenario.py`
-- Demo runner: `demo/simulate.py`
-- Using `@dataclass` for `Decision` type
-- Helper function structure for refill logic
-- Project structure with `src/`, `tests/`, `demo/` directories
+**What AI Helped With**:
+- Mapped the code behavior against the assignment rules
+- Confirmed the required missing pieces:
+  - per-customer state
+  - full bucket on first request
+  - continuous refill
+  - capacity cap
+  - correct deny behavior
+  - correct `retry_after_ms`
+  - correct timestamp tracking
+  - correct `Decision` fields
 
 **What I Kept**:
-✓ Folder structure (`src/`, `tests/`, `demo/`)  
-✓ Module separation (`main.py`, `types.py`, `utils.py`)  
-✓ Test file organization  
-✓ Using `@dataclass` decorator for Decision  
-✓ General helper function concept
-
-**What I Rejected/Modified**:
-✗ AI proposed using class instance time tracking with mutable state—I kept but ensured timestamps are immutable and consistent  
-✗ AI suggested initializing bucket at 0—I explicitly rejected and followed my APPROACH.md (initialize at capacity)  
-✗ AI code had retry_after in seconds—I corrected to milliseconds (×1000)  
-✗ AI proposed integer token storage—I changed to float for precision  
-✗ AI suggested background refill loop—I used on-demand calculation instead  
-✗ Test case assertions were loose ("allowed > 50")—I made them exact (58 allowed, 12 denied)
-
-**Key Decision Points**:
-1. **Token Storage**: Chose `float` over `int` for continuous refill accuracy
-2. **Refill Strategy**: Chose on-demand over background timer for scalability
-3. **Unit Conversion**: Ensured `retry_after_ms` uses milliseconds, not seconds
-4. **Initialization**: Ensured first bucket starts full, not empty
-
-**Time Spent**: ~10 minutes for structure discussion and review
+- The checklist of missing/required behaviors
 
 ---
 
-## AI Interaction #2: Debugging Test Failures
+## AI Interaction #2: Production-Ready Code Fixes
 
-**When**: During test validation phase
+**When**: During implementation phase
 
-**Tool**: GitHub Copilot (debugging suggestions)
+**Tool**: ChatGPT / Codex
 
 **What I Asked**:
+```text
+Add the missing pieces, fix them in a production-ready way, and test them.
 ```
-"I have a test that expects 59-60 allowed requests but got 58. 
-How should I debug rate limiter test assertions?"
-```
 
-**What AI Suggested**:
-- Print out intermediate values (tokens, elapsed time, refill amount)
-- Check if rounding is causing precision loss
-- Verify the formula step-by-step with example values
-- Consider whether test assumptions were too loose
+**What AI Helped With**:
+- Refactored per-customer state into a `BucketState`
+- Added config validation for invalid `capacity` / `refill_rate`
+- Preserved continuous elapsed-time refill logic
+- Capped tokens at capacity
+- Used epsilon-based allow check for float precision safety
+- Used `math.ceil()` for `retry_after_ms`
+- Prevented backward timestamps from creating tokens
 
-**What I Did**:
-- Manually traced through the scenario (as documented in APPROACH.md Section 6)
-- Confirmed the logic: 40 remaining + 20 refilled - 1 consumed = 59 available for burst
-- The 58 allowed (not 59-60) was **correct** based on:
-  - Time T=2000ms produces exactly 60 total tokens
-  - One check() call consumes 1, leaving 59
-  - Next 70 requests consume 58, leaving 1 for 12th request to fail
-- **Fixed the test**, not the implementation (test assertion was too loose)
-- Changed from `assert allowed == 59 or allowed == 60` to `assert allowed == 58`
-
-**Decision**: Kept the implementation, corrected the test. This confirmed the implementation was correct.
+**Files Affected**:
+- `src/main.py`
 
 ---
 
-## Summary of AI Usage vs. Independent Work
+## AI Interaction #3: Test Expansion
 
-| Phase | Component | AI Used | Independent |
-|-------|-----------|---------|-------------|
-| **Analysis** | APPROACH.md | ✗ No | ✓ Yes (100%) |
-| **Bugs Found** | 4 bugs identified | ✗ No | ✓ Yes (100%) |
-| **Algorithm Design** | On-demand refill | ✗ No | ✓ Yes (100%) |
-| **Implementation** | Core logic (`main.py`) | Partial (structure) | ✓ Yes (90%) |
-| **Types** | Decision dataclass, types.py | ✓ Suggested | ✓ Yes (adapted) |
-| **Testing** | Test logic & assertions | ✓ Discussed* | ✓ Yes (corrected) |
-| **Edge Cases** | Test coverage | ✗ No | ✓ Yes (100%) |
+**When**: During verification phase
 
-\* AI helped with debugging strategy, not the actual test code.
+**Tool**: ChatGPT / Codex
+
+**What I Asked**:
+```text
+Run tests, verify against the assignment again, and add coverage for edge cases.
+```
+
+**What AI Helped With**:
+- Added tests for:
+  - initial full bucket
+  - retry time correctness
+  - capacity cap
+  - per-customer isolation
+  - fractional refill
+  - backward timestamps
+  - invalid configuration
+  - assignment scenario
+  - cap recovery sequence
+
+**Files Affected**:
+- `tests/test_edge_cases.py`
+- `tests/test_scenario.py`
 
 ---
 
-## Integrity Statement
+## AI Interaction #4: Environment Setup and Test Execution
 
-- **APPROACH.md** written entirely by hand before any AI or coding
-- **All bugs identified** independently using code review techniques
-- **Algorithm designed** independently based on problem analysis
-- **Implementation** follows designed approach; AI only used for file organization
-- **Test corrections** made independently after careful analysis
-- **No code copied** from AI suggestions; all code written to match APPROACH.md design
+**When**: During verification phase
+
+**Tool**: ChatGPT / Codex
+
+**What I Asked**:
+```text
+Install pytest in the environment and run the test suite.
+```
+
+**What AI Helped With**:
+- Attempted `pytest` execution
+- Installed `pytest`
+- Ran the full suite with `python -m pytest -q`
+- Confirmed result: `9 passed`
+
+---
+
+## AI Interaction #5: Documentation Consistency Pass
+
+**When**: Final submission cleanup
+
+**Tool**: ChatGPT / Codex
+
+**What I Asked**:
+```text
+Update the files so the docs match the final implementation.
+```
+
+**What AI Helped With**:
+- Updated `APPROACH.md` so the design and example scenario match the final code
+- Updated this AI usage log to reflect the actual AI-assisted work
+
+**Files Affected**:
+- `APPROACH.md`
+- `AI_USAGE_LOG.md`
+
+---
+
+## Final Note
+
+AI was used only after the approach was already written. The final implementation and tests were reviewed against the assignment requirements and verified by execution.
