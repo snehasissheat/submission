@@ -7,6 +7,7 @@
 ---
 
 Session Note (pre-AI work): Problem was read first, then PRD and system design docs were prepared before starting coding-phase AI interactions.
+Design Control Note: PRD and system design were finalized early because they act as the source of truth and keep AI assistance grounded, reducing hallucinations and off-spec suggestions.
 
 ---
 
@@ -96,6 +97,19 @@ What I Kept:
 - Included required fields for each interaction
 What I Changed/Rejected:
 - Replaced free-form sections with strict assignment template fields
+
+---
+
+## AI Interaction #8
+Time: Final submission hardening phase, around 1:35 PM IST  
+Tool: ChatGPT / Codex  
+My Prompt: `also add pytest.ini with safe config to avoid evaluator env issues`  
+What I Kept:
+- Added `pytest.ini` configuration to limit test discovery to `tests/` folder
+- Excluded problematic directories from pytest collection (cache, src, demo, etc.)
+- Verified tests still pass with new configuration
+What I Changed/Rejected:
+- Ensured pytest collection stays scoped to prevent permission errors in evaluation environment
 
 ---
 
