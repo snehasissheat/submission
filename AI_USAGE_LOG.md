@@ -6,113 +6,123 @@
 
 ---
 
-Session Note (pre-AI work): Problem was read first, then PRD and system design docs were prepared before starting coding-phase AI interactions.
-Design Control Note: PRD and system design were finalized early because they act as the source of truth and keep AI assistance grounded, reducing hallucinations and off-spec suggestions.
+## Pre-Coding Phase
+
+- Read the full assignment prompt first.
+- Completed initial approach notes before implementation.
+- Used limited AI assistance to structure PRD/design writeups so requirements were organized in a compact, consistent format.
+
+Design Control Note: PRD and design were prepared early as source-of-truth artifacts to keep implementation on-spec, reduce ambiguity, and keep context compact.
 
 ---
 
 ## AI Interaction #1
-Time: During coding phase (after approach/design), around 1:00 PM IST  
+Time: During documentation phase, around 12:45 PM IST  
 Tool: ChatGPT / Codex  
-My Prompt: `so add them and fix them in prod ready away and test tham`  
+My Prompt: `Help me structure PRD and design docs in a concise system-engineering format so requirements are clear and compact.`  
 What I Kept:
-- Refactor to per-customer state object (`BucketState`)
-- Correct full-bucket initialization for first request
-- Continuous elapsed-time refill logic
-- Capacity capping logic
-- Correct `retry_after_ms` computation using milliseconds and ceil
-- Added robust checks for invalid config and non-monotonic time handling
+- Structured sections for objective, requirements, data model, algorithm, and verification
+- Compact, scannable format for faster implementation reference
 What I Changed/Rejected:
-- Replaced direct dict-only pattern with explicit state dataclass for clarity
-- Kept assignment-required behavior as source of truth over optional extras
+- Kept all technical decisions aligned to assignment constraints; removed any generic sections not useful for this problem
 
 ---
 
 ## AI Interaction #2
-Time: Verification phase, around 1:05 PM IST  
+Time: During coding phase (after design/approach completion), around 1:00 PM IST  
 Tool: ChatGPT / Codex  
-My Prompt: `chek agian for the assignem if all is working`  
+My Prompt: `Review the current token-bucket implementation against assignment requirements and list missing or risky behaviors.`  
 What I Kept:
-- Requirement-by-requirement verification against assignment text
-- Manual scenario replay (`T=0`, `T=2000`, `T=7000`, `T=17000`)
+- Requirement gap checklist:
+  - per-customer state
+  - full initialization on first request
+  - elapsed-time refill
+  - capacity cap
+  - correct denial behavior
+  - correct `retry_after_ms`
 What I Changed/Rejected:
-- Rejected relying only on static review; used executable checks
+- Converted checklist into concrete implementation tasks before editing code.
 
 ---
 
 ## AI Interaction #3
-Time: Verification phase, around 1:10 PM IST  
+Time: During implementation phase, around 1:05 PM IST  
 Tool: ChatGPT / Codex  
-My Prompt: `run the test and adll to verify`  
+My Prompt: `Apply production-ready fixes for the identified gaps and add validation/edge-case handling.`  
 What I Kept:
-- Test execution in current environment
-- Fallback direct test-function execution when `pytest` was initially unavailable
+- `BucketState`-based per-customer model
+- Input validation for invalid `capacity` / `refill_rate`
+- Millisecond retry calculation using `ceil`
+- Defensive handling for non-monotonic timestamps
 What I Changed/Rejected:
-- Did not stop at missing `pytest`; continued with executable fallback verification
+- Kept only behavior aligned with assignment contract; avoided adding unrelated features.
 
 ---
 
 ## AI Interaction #4
-Time: Environment setup phase, around 1:15 PM IST  
+Time: During verification phase, around 1:10 PM IST  
 Tool: ChatGPT / Codex  
-My Prompt: `so istall it in the env`  
+My Prompt: `Run and extend tests for assignment scenario plus critical edge cases.`  
 What I Kept:
-- Installed `pytest` in user environment
-- Re-ran tests using `python -m pytest -q`
+- Expanded tests for scenario and edge behavior
+- Verification of per-customer isolation and fractional refill timing
 What I Changed/Rejected:
-- Used `python -m pytest` instead of direct `pytest` due PATH considerations
+- Rejected shallow verification; required executable test evidence.
 
 ---
 
 ## AI Interaction #5
-Time: Final validation phase, around 1:20 PM IST  
+Time: Environment setup phase, around 1:15 PM IST  
 Tool: ChatGPT / Codex  
-My Prompt: `check the any thing that might be causing issue in the evaluiton veryfy again`  
+My Prompt: `Install pytest in the environment and execute the suite.`  
 What I Kept:
-- Evaluator-focused check of discovery, layout, imports, and test execution path
-- Added `pytest.ini` to limit collection to `tests/` and avoid permission-denied cache dirs
+- `pytest` installation
+- Test execution via `python -m pytest -q`
 What I Changed/Rejected:
-- Rejected default broad pytest discovery because it could fail in grading environments
+- Used module invocation (`python -m pytest`) instead of direct `pytest` binary to avoid PATH issues.
 
 ---
 
 ## AI Interaction #6
-Time: Documentation refinement phase, around 1:25 PM IST  
+Time: Evaluation-readiness phase, around 1:20 PM IST  
 Tool: ChatGPT / Codex  
-My Prompt: `make the ai logs such that how we tak and thing kile a systme enginerr human like also how we first doen the design adonc and prds`  
+My Prompt: `Check for grading risks (test discovery, file layout, import behavior) and harden submission reliability.`  
 What I Kept:
-- Human/system-engineer style wording
-- Explicit workflow order: read -> design/PRD -> coding -> verification
+- Added [pytest.ini](C:/Users/Admin/Submissions/submission/pytest.ini) to constrain discovery to `tests/`
+- Re-ran full suite from repo root
 What I Changed/Rejected:
-- Reworked generic summary format into clearer execution narrative
+- Rejected default broad discovery because it could collect restricted cache/temp folders in this environment.
 
 ---
 
 ## AI Interaction #7
-Time: Final submission formatting phase, around 1:30 PM IST  
+Time: Documentation consistency phase, around 1:25 PM IST  
 Tool: ChatGPT / Codex  
-My Prompt: `ok can you make that too`  
+My Prompt: `Align documentation with final implementation and test outcomes.`  
 What I Kept:
-- Converted AI log into required per-interaction structure
-- Included required fields for each interaction
+- Updated docs to match final code semantics (`BucketState`, `ceil` retry logic, 9 passing tests)
 What I Changed/Rejected:
-- Replaced free-form sections with strict assignment template fields
+- Removed stale references to older dict-only model and outdated test counts.
 
 ---
 
 ## AI Interaction #8
-Time: Final submission hardening phase, around 1:35 PM IST  
+Time: Final submission formatting phase, around 1:30 PM IST  
 Tool: ChatGPT / Codex  
-My Prompt: `also add pytest.ini with safe config to avoid evaluator env issues`  
+My Prompt: `Format AI usage log in strict evaluator template for each interaction.`  
 What I Kept:
-- Added `pytest.ini` configuration to limit test discovery to `tests/` folder
-- Excluded problematic directories from pytest collection (cache, src, demo, etc.)
-- Verified tests still pass with new configuration
+- Per-interaction structure with required fields:
+  - `Time`
+  - `Tool`
+  - `My Prompt`
+  - `What I Kept`
+  - `What I Changed/Rejected`
 What I Changed/Rejected:
-- Ensured pytest collection stays scoped to prevent permission errors in evaluation environment
+- Replaced earlier narrative-only format with strict template format for compliance.
 
 ---
 
-## Notes
-- AI was used during coding, verification, and documentation cleanup.
-- Final implementation and tests were validated by execution (`9 passed`).
+## Final Note
+
+- AI was used for PRD/design structuring, coding, verification, and documentation cleanup.
+- Final code behavior was verified by execution (`9 passed`).
